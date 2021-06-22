@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>登入 - layuiAdmin</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+  <link rel="stylesheet" href="../../layuiadmin/style/login.css" media="all">
+</head>
+<body>
+
+  <div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+    <div class="layadmin-user-login-main">
+      <div class="layadmin-user-login-box layadmin-user-login-header">
+        <h2>用户登录</h2>
+        <p>河北省重大技术需求征集调查系统</p>
+      </div>
+      <form action="">
+      <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+        <div class="layui-form-item" style="margin-top: 30px;">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="username"></label>
+          <input type="text" name="username" id="username" lay-verify="required" placeholder="用户名" class="layui-input">
+        </div>
+        <div class="layui-form-item" style="margin-top: 20px;">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="password"></label>
+          <input type="password" name="password" id="password" lay-verify="required" placeholder="密码" class="layui-input">
+        </div>
+        <div class="layui-form-item" style="margin-top: 20px;">
+          <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-login-submit">登 入</button>
+        </div>
+        <div class="layui-trans layui-form-item layadmin-user-login-other">
+          <label>社交账号登入</label>
+          <a href="javascript:;"><i class="layui-icon layui-icon-login-qq"></i></a>
+          <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat"></i></a>
+          <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo"></i></a>
+          
+          <a href="register.html" class="layadmin-user-jump-change layadmin-link">注册帐号</a>
+        </div>
+      </div>
+      </form>
+    </div>
+    
+    <div class="layui-trans layadmin-user-login-footer">
+      
+      <p>© 2020 <a href="" target="_blank">PJH</a></p>
+    </div>
+    
+    <!--<div class="ladmin-user-login-theme">
+      <script type="text/html" template>
+        <ul>
+          <li data-theme=""><img src="{{ layui.setter.base }}style/res/bg-none.jpg"></li>
+          <li data-theme="#03152A" style="background-color: #03152A;"></li>
+          <li data-theme="#2E241B" style="background-color: #2E241B;"></li>
+          <li data-theme="#50314F" style="background-color: #50314F;"></li>
+          <li data-theme="#344058" style="background-color: #344058;"></li>
+          <li data-theme="#20222A" style="background-color: #20222A;"></li>
+        </ul>
+      </script>
+    </div>-->
+    
+  </div>
+
+<script src="../../layuiadmin/layui/layui.js"></script>  
+<script src="../../static/js/jquery.min.js"></script>
+<script>
+  layui.config({
+    base: '../../layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'user'], function(){
+    var $ = layui.$
+    ,setter = layui.setter
+    ,admin = layui.admin
+    ,form = layui.form
+    ,router = layui.router()
+    ,search = router.search;
+
+    form.render();
+    
+  });
+  
+  $('form').submit(function (e) {
+      e.preventDefault();
+      console.log('1111');
+      let username = $("input[name='username']").val();
+      let password = $("input[name='password']").val();
+      if (username == '') {
+          layer.msg('请输入用户名');
+      } else if (password == '') {
+          layer.msg('请输入密码');
+      } else {
+      	layer.load(1);
+      	console.log('2222');
+          $.ajax({
+              url: "do_user_log",
+              type: 'post',
+              data: {
+                  username: username,
+                  password: password
+              },
+              success: function (data) {
+            	  console.log('333');
+                  layer.closeAll('loading');
+                  if(data=="yes"){
+                  	layer.open({
+                          content: '登录成功！',
+                          yes: function (layero, index) {
+                          	window.location="/Demand/view/demand/demand_add.jsp";
+                          }
+                      });
+                  } else if(data=="admin"){
+                  	layer.open({
+                   	    content: "登录成功！",
+                   	 	yes: function (layero, index) {
+                       	  window.location="/Demand/view/demand/demand_manage.jsp";
+                        }
+                   	});
+                  } else if(data=="check"){
+                   	layer.open({
+                    	 content: "登录成功！",
+                    	 yes: function (layero, index) {
+                           window.location="/Demand/view/demand/check.jsp";
+                         }
+                    });
+                  } else if(data=="no"){
+                  	layer.open({
+                  	    content: "密码错误！"
+                  	});
+                  } else if(data=="notfind"){
+                	  layer.open({
+                    	    content: "用户名不存在，请先注册！"
+                    	});
+                  }
+              },
+              error: function() {
+              	  layer.msg('网络错误');
+                  layer.closeAll('loading')
+              },
+              dataType: "text"
+          });
+      }
+      return false;
+  });
+</script>
+</body>
+</html>
